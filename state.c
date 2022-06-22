@@ -25,6 +25,7 @@ static char get_board_at(game_state_t* state, int x, int y) {
 
 /* Helper function to set a character on the board (already implemented for you). */
 static void set_board_at(game_state_t* state, int x, int y, char ch) {
+  // printf("%p\n",state->board[y]);
   state->board[y][x] = ch;
 }
 
@@ -34,21 +35,19 @@ game_state_t* create_default_state() {
   game_state_t * ptr = (game_state_t *)malloc(sizeof(game_state_t));
   ptr->x_size = 14;
   ptr->y_size = 10;
-  char **board = (char *)malloc(sizeof(char *)*ptr->y_size);
-
-  for(int i = 0;i<ptr->x_size;i++){
-    board[i] = (char **)malloc(sizeof(char)*ptr->x_size);
+  char **board = (char **)malloc(sizeof(char *)*ptr->y_size);
+  for(int i = 0;i<ptr->y_size;i++){
+    board[i] = (char *)malloc(sizeof(char)*ptr->x_size);
     memset(board[i],32,ptr->x_size);
   }
   ptr->board = board;
-  for (int x = 0; x < ptr->x_size; x++) {
-    for (int y = 0; y < ptr->y_size; y++) {
+  for (int y = 0; y < ptr->y_size; y++) {
+    for (int x = 0; x < ptr->x_size; x++) {
       if (x == 0 || y == 0 || x == (ptr->x_size -1) || y == (ptr->y_size - 1)) {
         set_board_at(ptr,x,y,'#');
       }
     }
   }
-  set_board_at(ptr,9,2,'*');
   set_board_at(ptr,9,2,'*');
   set_board_at(ptr,4,4,'d');
   set_board_at(ptr,5,4,'>');
@@ -66,12 +65,28 @@ game_state_t* create_default_state() {
 /* Task 2 */
 void free_state(game_state_t* state) {
   // TODO: Implement this function.
+  for(int i = 0;i<state->x_size;i++){
+    free(state->board[i]);
+  }
+  free(state->board);
+  for(int j = 0;j<state->num_snakes;j++){
+    free(state->snakes);
+  }
+  free(state);
   return;
 }
 
 /* Task 3 */
 void print_board(game_state_t* state, FILE* fp) {
   // TODO: Implement this function.
+  for (int y = 0; y < state->y_size; y++) {
+    for (int x = 0; x < state->x_size; x++) {
+      fprintf(fp,"%c",state->board[y][x]);
+      //printf("%c",state->board[y][x]);
+    }
+    //printf("\n");
+    fprintf(fp,"\n");
+  }
   return;
 }
 
@@ -85,38 +100,73 @@ void save_board(game_state_t* state, char* filename) {
 /* Task 4.1 */
 static bool is_tail(char c) {
   // TODO: Implement this function.
-  return true;
+  return c == 'w' || c == 'a' || c == 's' || c == 'd';
 }
 
 static bool is_snake(char c) {
   // TODO: Implement this function.
-  return true;
+  if (c == '^' || c == '<' || c == '>' || c == 'v' || c == 'x'){
+    return true;
+  }else{
+    return is_tail(c);
+  }
 }
 
 static char body_to_tail(char c) {
-  // TODO: Implement this function.
-  return '?';
+  if (c == '^'){
+    return 'w';
+  }else if (c == '<'){
+    return 'a';
+  }else if (c == 'v'){
+    return 's';
+  }else if (c == '>'){
+    return 'd';
+  }else{
+    return '?';
+  }
 }
 
 static int incr_x(char c) {
-  // TODO: Implement this function.
-  return 0;
+  if (c == '>' || c == 'd'){
+    return 1;
+  }else if (c == '<' || c == 'a'){
+    return -1;
+  }else{
+    return 0;
+  }
 }
 
 static int incr_y(char c) {
-  // TODO: Implement this function.
-  return 0;
+  if(c == 'v' || c == 's'){
+    return 1;
+  }else if (c == '^' || c == 'w'){
+    return -1;
+  }else{
+    return 0;
+  }
 }
 
 /* Task 4.2 */
 static char next_square(game_state_t* state, int snum) {
   // TODO: Implement this function.
-  return '?';
+  int x = state->snakes[snum].head_x;
+  int y = state->snakes[snum].head_y;
+  //printf("%c\n",get_board_at(state,x,y));
+  x += incr_x(get_board_at(state,x,y));
+  y += incr_y(get_board_at(state,x,y));
+  return get_board_at(state,x,y);
 }
 
 /* Task 4.3 */
 static void update_head(game_state_t* state, int snum) {
-  // TODO: Implement this function.
+  // TODO: Implement this function
+  int x = state->snakes[snum].head_x;
+  int y = state->snakes[snum].head_y;
+  //printf("%c\n",get_board_at(state,x,y));
+  set_board_at(state,x + incr_x(get_board_at(state,x,y)),
+              y + incr_y(get_board_at(state,x,y)),get_board_at(state,x,y));
+  state->snakes[snum].head_x += incr_x(get_board_at(state,x,y));
+  state->snakes[snum].head_y += incr_y(get_board_at(state,x,y));
   return;
 }
 

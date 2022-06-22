@@ -99,31 +99,36 @@ bool assert_state_equals(game_state_t* expected, game_state_t* actual) {
 
 bool test_is_tail() {
   // TODO: Implement this if you'd like!
-  printf("%s\n", "test_is_tail doesn't have any tests.");
+  assert_true("wuhu",is_tail('w'));
+  assert_true("wuhu",is_tail('a'));
+  assert_true("wuhu",is_tail('s'));
+  assert_true("wuhu",is_tail('d'));
+  assert_true("wuhu",!is_tail('q'));
   return true;
 }
 
 bool test_is_snake() {
   // TODO: Implement this if you'd like!
-  printf("%s\n", "test_is_snake doesn't have any tests.");
+  assert_true("wuhu",is_snake('v'));
+  assert_true("wuhu",is_snake('w'));
   return true;
 }
 
 bool test_body_to_tail() {
   // TODO: Implement this if you'd like!
-  printf("%s\n", "test_body_to_tail doesn't have any tests.");
+  assert_equals_char("wuhu",'s',body_to_tail('v'));
   return true;
 }
 
 bool test_incr_x() {
   // TODO: Implement this if you'd like!
-  printf("%s\n", "test_incr_x doesn't have any tests.");
+  //printf("%s\n", "test_incr_x doesn't have any tests.");
   return true;
 }
 
 bool test_incr_y() {
   // TODO: Implement this if you'd like!
-  printf("%s\n", "test_incr_y doesn't have any tests.");
+  //printf("%s\n", "test_incr_y doesn't have any tests.");
   return true;
 }
 
@@ -238,7 +243,7 @@ bool test_print_board() {
     printf("%s\n", "Your printed board doesn't match the expected output. See unit-test-out.snk for what you printed.");
     return false;
   }
-
+  // printf("finish print :\n");
   return true;
 }
 
